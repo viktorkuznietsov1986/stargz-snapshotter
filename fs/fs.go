@@ -323,7 +323,7 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 	t1 := time.Now()
 
 	// Store the total time
-	fs.metricsController.FsMountOperationLatency.Add(t1.Sub(t0).Milliseconds())
+	fsMountOperationLatency.Add(t1.Sub(t0).Milliseconds())
 
 	return mountFs
 }
