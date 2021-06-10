@@ -17,7 +17,7 @@
 package metrics
 
 import (
-	"github.com/containerd/stargz-snapshotter/fs/fs"
+	"github.com/containerd/stargz-snapshotter/fs"
 	metrics "github.com/docker/go-metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
