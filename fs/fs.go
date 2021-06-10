@@ -78,6 +78,7 @@ type options struct {
 var fsMountOperationLatency = prometheus.NewGauge(prometheus.GaugeOpts{
 	Name:      "fs_mount_operation_latency",
 	Help:      "The latency of Mount operation in fs.go.",
+	Unit:	   "milliseconds"
 })
 
 func WithGetSources(s source.GetSources) Option {
@@ -324,7 +325,6 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 
 	// Store the total time
 	fsMountOperationLatency.Add(float64(duration.Nanoseconds()))
-	fmt.Printf("[fs.Mount() latency = %f]", float64(duration.Nanoseconds()))
 
 	return mountFs
 }
