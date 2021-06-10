@@ -17,12 +17,11 @@
 package metrics
 
 import (
-	metrics "github.com/docker/go-metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 // This metric is responsible 
-var fsMountOperationLatency := prometheus.NewGauge(prometheus.GaugeOpts{
+var fsMountOperationLatency = prometheus.NewGauge(prometheus.GaugeOpts{
 	Name:      "fs_mount_operation_latency",
 	Help:      "The latency of Mount operation in fs.go.",
 })

@@ -108,7 +108,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
-		prometheus.MustRegister(c.fsMountOperationLatency) // just a dirty hack
+		prometheus.MustRegister(c.fsMountOperationLatency) // just a dirty hack for now
 	}
 
 	return &filesystem{
