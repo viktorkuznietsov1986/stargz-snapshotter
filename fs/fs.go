@@ -324,6 +324,7 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 
 	// Store the total time
 	fsMountOperationLatency.Add(float64(t1.Sub(t0).Milliseconds()))
+	fmt.Printf("[fs.Mount() latency = %f]", float64(t1.Sub(t0).Milliseconds()))
 
 	return mountFs
 }
