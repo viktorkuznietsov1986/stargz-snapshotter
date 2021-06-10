@@ -108,6 +108,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
+		prometheus.MustRegister(c.fsMountOperationLatency) // just a dirty hack
 	}
 
 	return &filesystem{
@@ -141,6 +142,9 @@ type filesystem struct {
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
+	// Start time
+	t0 := time.Millisecond
+	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
 	// tasks.
@@ -306,7 +310,16 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 	}
 
 	go server.Serve()
-	return server.WaitMount()
+
+	mountFs := server.WaitMount()
+
+	// End time
+	t1 := time.Millisecond
+
+	// Store the total time
+	fs.metricsController.
+
+	return mountFs
 }
 
 func (fs *filesystem) Check(ctx context.Context, mountpoint string, labels map[string]string) error {

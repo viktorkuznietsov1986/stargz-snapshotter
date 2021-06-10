@@ -30,9 +30,12 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 	}
 	c := &Controller{
 		ns:    ns,
+		generalMetrics: make(map[string]*metric)
 		layer: make(map[string]layer.Layer),
 	}
 	c.metrics = append(c.metrics, layerMetrics...)
+	c.fsMountOperationLatency = fsMountOperationLatency
+
 	ns.Add(c)
 	return c
 }
@@ -40,6 +43,7 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 type Controller struct {
 	ns      *metrics.Namespace
 	metrics []*metric
+	fsMountOperationLatency *prometheus.Gauge
 
 	layer   map[string]layer.Layer
 	layerMu sync.RWMutex
@@ -47,6 +51,10 @@ type Controller struct {
 
 func (c *Controller) Describe(ch chan<- *prometheus.Desc) {
 	for _, e := range c.metrics {
+		ch <- e.desc(c.ns)
+	}
+
+	for _, e := range c.generalMetrics {
 		ch <- e.desc(c.ns)
 	}
 }
