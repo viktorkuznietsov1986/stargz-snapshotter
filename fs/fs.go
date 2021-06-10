@@ -108,7 +108,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
-		prometheus.MustRegister(c.fsMountOperationLatency) // just a dirty hack for now
+		prometheus.MustRegister(c.FsMountOperationLatency) // just a dirty hack for now
 	}
 
 	return &filesystem{
@@ -317,7 +317,7 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 	t1 := time.Now()
 
 	// Store the total time
-	fs.metricsController.fsMountOperationLatency.Add(t1.Sub(t0).Milliseconds())
+	fs.metricsController.FsMountOperationLatency.Add(t1.Sub(t0).Milliseconds())
 
 	return mountFs
 }
