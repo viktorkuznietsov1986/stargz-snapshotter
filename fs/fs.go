@@ -75,6 +75,11 @@ type options struct {
 	getSources source.GetSources
 }
 
+var fsMountOperationLatency = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name:      "fs_mount_operation_latency",
+	Help:      "The latency of Mount operation in fs.go.",
+})
+
 func WithGetSources(s source.GetSources) Option {
 	return func(opts *options) {
 		opts.getSources = s
@@ -109,7 +114,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
-		prometheus.MustRegister(c.FsMountOperationLatency) // just a dirty hack for now
+		prometheus.MustRegister(fsMountOperationLatency) // just a dirty hack for now
 	}
 
 	return &filesystem{
