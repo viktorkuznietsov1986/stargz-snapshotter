@@ -78,7 +78,6 @@ type options struct {
 var fsMountOperationLatency = prometheus.NewGauge(prometheus.GaugeOpts{
 	Name:      "fs_mount_operation_latency",
 	Help:      "The latency of Mount operation in fs.go.",
-	Unit:	   "milliseconds"
 })
 
 func WithGetSources(s source.GetSources) Option {
@@ -148,9 +147,17 @@ type filesystem struct {
 	metricsController     *fsmetrics.Controller
 }
 
+func elapsed(what string) func() {
+    start := time.Now()
+    return func() {
+        fmt.Printf("%s took %v\n", what, time.Since(start))
+		fsMountOperationLatency.Add(float64(500))
+    }
+}
+
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Start time
-	start := time.Now()
+	defer elapsed("Mount")
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
@@ -318,15 +325,7 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 
 	go server.Serve()
 
-	mountFs := server.WaitMount()
-
-	// End time
-	duration := time.Since(start)
-
-	// Store the total time
-	fsMountOperationLatency.Add(float64(duration.Nanoseconds()))
-
-	return mountFs
+	return server.WaitMount()
 }
 
 func (fs *filesystem) Check(ctx context.Context, mountpoint string, labels map[string]string) error {
