@@ -143,7 +143,7 @@ type filesystem struct {
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Start time
-	t0 := time.Millisecond
+	t0 := time.Now()
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
@@ -314,10 +314,10 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 	mountFs := server.WaitMount()
 
 	// End time
-	t1 := time.Millisecond
+	t1 := time.Now()
 
 	// Store the total time
-	fs.metricsController.fsMountOperationLatency.Add(t1-t0)
+	fs.metricsController.fsMountOperationLatency.Add(t1.Sub(t0).Milliseconds())
 
 	return mountFs
 }
