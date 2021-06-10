@@ -157,7 +157,7 @@ func elapsed(what string) func() {
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Start time
-	defer elapsed("Mount")
+	defer elapsed("Mount")()
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
