@@ -151,7 +151,7 @@ func elapsed(what string) func() {
     start := time.Now()
     return func() {
         fmt.Printf("%s took %v\n", what, time.Since(start))
-		fsMountOperationLatency.Add(float64(500))
+		fsMountOperationLatency.Add(float64(time.Since(start).Nanoseconds() / 1e6))
     }
 }
 
