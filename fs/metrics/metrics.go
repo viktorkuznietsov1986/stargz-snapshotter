@@ -34,7 +34,7 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 	}
 
 	c.metrics = append(c.metrics, layerMetrics...)
-	c.fsMountOperationLatency = &fsMountOperationLatency
+	c.FsMountOperationLatency = &fsMountOperationLatency
 
 	ns.Add(c)
 	return c
