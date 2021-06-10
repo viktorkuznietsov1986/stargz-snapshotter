@@ -147,12 +147,17 @@ type filesystem struct {
 	metricsController     *fsmetrics.Controller
 }
 
-func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
-	//start := time.Now()
-	defer func() {
-        // Update metric
+func elapsed(what string) func() {
+    start := time.Now()
+    return func() {
+        fmt.Printf("%s took %v\n", what, time.Since(start))
 		fsMountOperationLatency.Add(float64(500))
-	}()
+    }
+}
+
+func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
+	// Start time
+	defer elapsed("Mount")
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
