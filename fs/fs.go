@@ -75,7 +75,7 @@ type options struct {
 	getSources source.GetSources
 }
 
-var fsMountOperationLatency = s.Metrics.RedisDurations = prometheus.NewSummary(
+var fsMountOperationLatency = prometheus.NewSummary(
         prometheus.SummaryOpts{
 	        Name:       "fs_mount_request_duration",
 	        Help:       "fs mount latency in milliseconds",
