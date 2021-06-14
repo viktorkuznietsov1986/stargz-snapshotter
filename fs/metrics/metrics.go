@@ -34,7 +34,6 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 	}
 
 	c.metrics = append(c.metrics, layerMetrics...)
-	c.FsMountOperationLatency = &fsMountOperationLatency
 
 	ns.Add(c)
 	return c
@@ -43,7 +42,6 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 type Controller struct {
 	ns      *metrics.Namespace
 	metrics []*metric
-	FsMountOperationLatency *prometheus.Gauge
 
 	layer   map[string]layer.Layer
 	layerMu sync.RWMutex
