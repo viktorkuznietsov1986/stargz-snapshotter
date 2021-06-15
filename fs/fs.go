@@ -112,7 +112,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var ns *metrics.Namespace
 	var fsMetrics *fsmetrics.FsMetrics
 	if !cfg.NoPrometheus {
-		ns = metrics.NewNamespace("	", "fs", nil)
+		ns = metrics.NewNamespace("stargz", "fs", nil)
 		fsMetrics = fsmetrics.NewFsMetrics() // creating a new FsMetrics
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
@@ -120,9 +120,9 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 		metrics.Register(ns)
 	}
 
-	if (fsMetrics != nil) {
-		fsMetrics.Register()
-	}
+	// if (fsMetrics != nil) {
+	// 	fsMetrics.Register()
+	// }
 
 	return &filesystem{
 		resolver:              r,

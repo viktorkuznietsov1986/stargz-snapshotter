@@ -40,12 +40,14 @@ func NewFsMetrics() *FsMetrics {
 					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 				}),
 		}
+
+		instance.register()
 	})
 
 	return instance
 }
 
 // we can potentially utilize options
-func (m *FsMetrics) Register() {
+func (m *FsMetrics) register() {
 	prometheus.MustRegister(m.FsMountOperationDuration)
 }
