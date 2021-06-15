@@ -17,7 +17,6 @@
 package metrics
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
