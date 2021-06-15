@@ -39,7 +39,6 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/reader"
 	"github.com/containerd/stargz-snapshotter/fs/remote"
 	fusefs "github.com/hanwen/go-fuse/v2/fs"
-	fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
 	"github.com/hanwen/go-fuse/v2/fuse"
 	digest "github.com/opencontainers/go-digest"
 	"golang.org/x/sys/unix"
