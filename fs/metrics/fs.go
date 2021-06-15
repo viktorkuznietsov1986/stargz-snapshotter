@@ -17,6 +17,8 @@
 package metrics
 
 import (
+	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -28,7 +30,7 @@ func NewFsMetrics(name string, subsystem string) *FsMetrics {
 	return &FsMetrics {
 		FsMountOperationDuration: prometheus.NewSummary(
 			prometheus.SummaryOpts{
-				Name:       name+"_"+subsystem+"_"+"mount_request_duration_111",
+				Name:       fmt.Sprintf("%s_%s_mount_request_duration_111", name, subsystem),
 				Help:       "fs mount latency in milliseconds",
 				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 			}),
