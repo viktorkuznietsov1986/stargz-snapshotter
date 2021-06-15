@@ -120,6 +120,10 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 		metrics.Register(ns)
 	}
 
+	if (fsMetrics != nil) {
+		fsMetrics.Register()
+	}
+
 	return &filesystem{
 		resolver:              r,
 		getSources:            getSources,
