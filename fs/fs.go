@@ -110,10 +110,10 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	}
 
 	var ns *metrics.Namespace
-	var fsMetrics *metrics.FsMetrics
+	var fsMetrics *fsmetrics.FsMetrics
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
-		fsMetrics = metrics.NewFsMetrics();
+		fsMetrics = fsmetrics.NewFsMetrics();
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
