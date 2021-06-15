@@ -20,8 +20,24 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// This metric is responsible 
-var fsMountOperationLatency = prometheus.NewGauge(prometheus.GaugeOpts{
-	Name:      "fs_mount_operation_latency",
-	Help:      "The latency of Mount operation in fs.go.",
-})
+type FsMetrics struct {
+	FsMountOperationDuration prometheus.Summary,
+}
+
+func NewFsMetrics() *FsMetrics {
+	m := &FsMetrics {
+		FsMountOperationDuration = prometheus.NewSummary(
+			prometheus.SummaryOpts{
+				Name:       "fs_mount_request_duration_111",
+				Help:       "fs mount latency in milliseconds",
+				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+			})
+	}
+	
+	return m
+}
+
+// we can potentially utilize options
+func (m *FsMetrics) Register() {
+	prometheus.MustRegister(m.FsMountOperationDuration)
+}

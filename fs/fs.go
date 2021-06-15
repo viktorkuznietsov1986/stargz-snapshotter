@@ -75,12 +75,12 @@ type options struct {
 	getSources source.GetSources
 }
 
-var fsMountOperationLatency = prometheus.NewSummary(
+/*var fsMountOperationLatency = prometheus.NewSummary(
         prometheus.SummaryOpts{
 	        Name:       "fs_mount_request_duration",
 	        Help:       "fs mount latency in milliseconds",
 	        Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-	    })
+	    })*/
 
 func WithGetSources(s source.GetSources) Option {
 	return func(opts *options) {
@@ -110,13 +110,18 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	}
 
 	var ns *metrics.Namespace
+	var fsMetrics *metrics.FsMetrics
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
+		fsMetrics = metrics.NewFsMetrics();
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
-		prometheus.MustRegister(fsMountOperationLatency) // just a dirty hack for now
+	}
+
+	if (fsMetrics != nil) {
+		fsMetrics.Register()
 	}
 
 	return &filesystem{
@@ -131,6 +136,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 		allowNoVerification:   cfg.AllowNoVerification,
 		disableVerification:   cfg.DisableVerification,
 		metricsController:     c,
+		fsMetrics:			   fsMetrics,
 	}, nil
 }
 
@@ -147,12 +153,15 @@ type filesystem struct {
 	disableVerification   bool
 	getSources            source.GetSources
 	metricsController     *fsmetrics.Controller
+	fsMetrics			  *fsmetrics.FsMetrics
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
-	timer := prometheus.NewTimer(fsMountOperationLatency)
-	defer timer.ObserveDuration()
+	if (fs.fsMetrics != nil) {
+		timer := prometheus.NewTimer(fs.fsMetrics)
+		defer timer.ObserveDuration()
+	}
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
