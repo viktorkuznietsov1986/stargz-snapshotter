@@ -39,6 +39,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/reader"
 	"github.com/containerd/stargz-snapshotter/fs/remote"
 	fusefs "github.com/hanwen/go-fuse/v2/fs"
+	fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
 	"github.com/hanwen/go-fuse/v2/fuse"
 	digest "github.com/opencontainers/go-digest"
 	"golang.org/x/sys/unix"
@@ -255,10 +256,12 @@ type file struct {
 	n  *node
 	e  *estargz.TOCEntry
 	ra io.ReaderAt
+	m  *fsmetrics.FsMetrics
 }
 
 var _ = (fusefs.FileReader)((*file)(nil))
 
+// measure the time it takes for that reader to complete (every file will have a separate file object)
 func (f *file) Read(ctx context.Context, dest []byte, off int64) (fuse.ReadResult, syscall.Errno) {
 	n, err := f.ra.ReadAt(dest, off)
 	if err != nil && err != io.EOF {

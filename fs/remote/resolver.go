@@ -290,6 +290,7 @@ func getSize(ctx context.Context, url string, tr http.RoundTripper, timeout time
 		headStatusCode, res.StatusCode)
 }
 
+// one per layer
 type fetcher struct {
 	url           string
 	urlMu         sync.Mutex
@@ -351,6 +352,8 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 	req.Header.Add("Range", fmt.Sprintf("bytes=%s", ranges[:len(ranges)-1]))
 	req.Header.Add("Accept-Encoding", "identity")
 	req.Close = false
+
+	// add the metric to complete the round trip
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {
 		return nil, err

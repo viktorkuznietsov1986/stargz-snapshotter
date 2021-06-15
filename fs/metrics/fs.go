@@ -18,26 +18,41 @@ package metrics
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
+)
+
+var once sync.Once
+
+var (
+	instance *FsMetrics
 )
 
 type FsMetrics struct {
 	FsMountOperationDuration prometheus.Summary
 }
 
-func NewFsMetrics(name string, subsystem string) *FsMetrics {
-	return &FsMetrics {
-		FsMountOperationDuration: prometheus.NewSummary(
-			prometheus.SummaryOpts{
-				Name:       fmt.Sprintf("%s_%s_mount_request_duration_111", name, subsystem),
-				Help:       "fs mount latency in milliseconds",
-				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-			}),
-	}
+func NewFsMetrics() *FsMetrics {
+
+	once.Do(fund() {
+		instance = &FsMetrics {
+			FsMountOperationDuration: prometheus.NewSummary(
+				prometheus.SummaryOpts{
+					Name:       "fs_mount_request_duration_111",
+					Help:       "fs mount latency in milliseconds",
+					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+				}),
+		}
+
+	})
+
+	instance.register()
+
+	return instance
 }
 
 // we can potentially utilize options
-func (m *FsMetrics) Register() {
+func (m *FsMetrics) register() {
 	prometheus.MustRegister(m.FsMountOperationDuration)
 }
