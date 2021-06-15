@@ -159,7 +159,7 @@ type filesystem struct {
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
 	if (fs.fsMetrics != nil) {
-		timer := prometheus.NewTimer(fs.fsMetrics)
+		timer := prometheus.NewTimer(fs.fsMetrics.FsMountOperationDuration)
 		defer timer.ObserveDuration()
 	}
 	
