@@ -25,17 +25,14 @@ import (
 
 var once sync.Once
 
-var (
-	instance *FsMetrics
-)
-
 type FsMetrics struct {
 	FsMountOperationDuration prometheus.Summary
 }
 
-func NewFsMetrics() *FsMetrics {
+var instance *FsMetrics
 
-	once.Do(fund() {
+func NewFsMetrics() *FsMetrics {
+	once.Do(func() {
 		instance = &FsMetrics {
 			FsMountOperationDuration: prometheus.NewSummary(
 				prometheus.SummaryOpts{
