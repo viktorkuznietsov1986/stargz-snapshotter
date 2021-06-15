@@ -39,15 +39,14 @@ func NewFsMetrics() *FsMetrics {
 		instance = &FsMetrics {
 			FsMountOperationDuration: prometheus.NewSummary(
 				prometheus.SummaryOpts{
-					Name:       "fs_mount_request_duration_111",
+					Name:       "fs_mount_request_duration_122",
 					Help:       "fs mount latency in milliseconds",
 					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 				}),
 		}
 
+		instance.register()
 	})
-
-	instance.register()
 
 	return instance
 }
