@@ -256,7 +256,6 @@ type file struct {
 	n  *node
 	e  *estargz.TOCEntry
 	ra io.ReaderAt
-	m  *fsmetrics.FsMetrics
 }
 
 var _ = (fusefs.FileReader)((*file)(nil))
