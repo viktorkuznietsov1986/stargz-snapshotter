@@ -24,11 +24,11 @@ type FsMetrics struct {
 	FsMountOperationDuration prometheus.Summary
 }
 
-func NewFsMetrics() *FsMetrics {
+func NewFsMetrics(name string, subsystem string) *FsMetrics {
 	return &FsMetrics {
 		FsMountOperationDuration: prometheus.NewSummary(
 			prometheus.SummaryOpts{
-				Name:       "fs_mount_request_duration_111",
+				Name:       name+"_"+subsystem+"_"+"mount_request_duration_111",
 				Help:       "fs mount latency in milliseconds",
 				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 			}),
