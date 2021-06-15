@@ -48,6 +48,6 @@ func NewFsMetrics() *FsMetrics {
 }
 
 // we can potentially utilize options
-func (m *FsMetrics) register() {
+func (m *FsMetrics) Register() {
 	prometheus.MustRegister(m.FsMountOperationDuration)
 }
