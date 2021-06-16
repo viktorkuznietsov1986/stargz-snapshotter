@@ -49,17 +49,4 @@ var layerMetrics = []*metric{
 			}
 		},
 	},
-	{
-		name: "layer_pre_fetched_size",
-		help: "Total pre fetched size of the layer",
-		unit: metrics.Bytes,
-		vt:   prometheus.CounterValue,
-		getValues: func(l layer.Layer) []value {
-			return []value{
-				{
-					v: float64(l.Info().FetchedSize),
-				},
-			}
-		},
-	},
 }

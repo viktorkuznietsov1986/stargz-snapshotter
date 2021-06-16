@@ -45,7 +45,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-	fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
+	// fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
 	"github.com/pkg/errors"
 )
 
@@ -355,11 +355,11 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 	req.Close = false
 
 	// add the metric to complete the round trip
-	var m = fsmetrics.NewFsMetrics()
-	if m != nil {
-		timer := prometheus.NewTimer(m.FetchRoundtripDuration)
-		defer timer.ObserveDuration()
-	}
+	// var m = fsmetrics.NewFsMetrics()
+	// if m != nil {
+	// 	timer := prometheus.NewTimer(m.FetchRoundtripDuration)
+	// 	defer timer.ObserveDuration()
+	// }
 
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {
