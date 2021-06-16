@@ -26,6 +26,7 @@ var once sync.Once
 
 type FsMetrics struct {
 	FsMountOperationDuration prometheus.Summary
+	FetchRoundtripDuration prometheus.Summary
 }
 
 var instance *FsMetrics
