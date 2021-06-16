@@ -36,7 +36,13 @@ func NewFsMetrics() *FsMetrics {
 			FsMountOperationDuration: prometheus.NewSummary(
 				prometheus.SummaryOpts{
 					Name:       "fs_mount_request_duration_122",
-					Help:       "fs mount latency in milliseconds",
+					Help:       "fs mount latency in seconds",
+					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+				}),
+			FetchRoundtripDuration: prometheus.NewSummary(
+				prometheus.SummaryOpts{
+					Name:       "fetch_request_roundtrip_duration",
+					Help:       "fetch request roundtrip latency in seconds",
 					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 				}),
 		}
@@ -48,4 +54,5 @@ func NewFsMetrics() *FsMetrics {
 // we can potentially utilize options
 func (m *FsMetrics) Register() {
 	prometheus.MustRegister(m.FsMountOperationDuration)
+	prometheus.MustRegister(m.FetchRoundtripDuration)
 }
