@@ -24,7 +24,7 @@ import (
 
 const (
 	// DockerOperationsKey is the key for docker operation metrics.
-	OperationsLatencyKey = "request_duration"
+	OperationsLatencyKey = "operation_duration"
 	
 
 	// Keep the "kubelet" subsystem for backward compatibility.
