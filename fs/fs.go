@@ -110,19 +110,19 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	}
 
 	var ns *metrics.Namespace
-	var fsMetrics *fsmetrics.FsMetrics
+	var fsMetrics *fsmetrics.FileSystemMetrics
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
-		fsMetrics = fsmetrics.NewFsMetrics() // creating a new FsMetrics
+		fsMetrics = fsmetrics.GetMetrics()
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
 	}
 
-	if (fsMetrics != nil) {
-		fsMetrics.Register()
-	}
+	// if (fsMetrics != nil) {
+	// 	fsMetrics.Register()
+	// }
 
 	return &filesystem{
 		resolver:              r,
@@ -136,7 +136,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 		allowNoVerification:   cfg.AllowNoVerification,
 		disableVerification:   cfg.DisableVerification,
 		metricsController:     c,
-		fsMetrics:			   fsMetrics,
+		fileSystemMetrics:	   fsMetrics,
 	}, nil
 }
 
@@ -153,13 +153,13 @@ type filesystem struct {
 	disableVerification   bool
 	getSources            source.GetSources
 	metricsController     *fsmetrics.Controller
-	fsMetrics			  *fsmetrics.FsMetrics
+	fileSystemMetrics	  *fsmetrics.FileSystemMetrics
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
-	if (fs.fsMetrics != nil) {
-		timer := prometheus.NewTimer(fs.fsMetrics.FsMountOperationDuration)
+	if (fs.fileSystemMetrics != nil) {
+		timer := prometheus.NewTimer(fs.fileSystemMetrics.MountOperationDuration)
 		defer timer.ObserveDuration()
 	}
 	

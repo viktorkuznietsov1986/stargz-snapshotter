@@ -24,19 +24,19 @@ import (
 
 var once sync.Once
 
-type FsMetrics struct {
-	FsMountOperationDuration prometheus.Summary
+type FileSystemMetrics struct {
+	MountOperationDuration prometheus.Summary
 	FetchRoundtripDuration prometheus.Summary
 }
 
-var instance *FsMetrics
+var instance *FileSystemMetrics
 
-func NewFsMetrics() *FsMetrics {
+func GetMetrics() *FileSystemMetrics {
 	once.Do(func() {
-		instance = &FsMetrics {
-			FsMountOperationDuration: prometheus.NewSummary(
+		instance = &FileSystemMetrics {
+			MountOperationDuration: prometheus.NewSummary(
 				prometheus.SummaryOpts{
-					Name:       "fs_mount_request_duration_122",
+					Name:       "fs_mount_request_duration",
 					Help:       "fs mount latency in seconds",
 					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 				}),
@@ -47,13 +47,15 @@ func NewFsMetrics() *FsMetrics {
 					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 				}),
 		}
+
+		isntance.register()
 	})
 
 	return instance
 }
 
 // we can potentially utilize options
-func (m *FsMetrics) Register() {
-	prometheus.MustRegister(m.FsMountOperationDuration)
+func (m *FileSystemMetrics) register() {
+	prometheus.MustRegister(m.MountOperationDuration)
 	prometheus.MustRegister(m.FetchRoundtripDuration)
 }
