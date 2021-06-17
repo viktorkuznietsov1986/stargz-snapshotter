@@ -22,40 +22,36 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var once sync.Once
+const (
+	// DockerOperationsKey is the key for docker operation metrics.
+	OperationsLatencyKey = "request_duration"
+	
 
-type FileSystemMetrics struct {
-	MountOperationDuration prometheus.Summary
-	FetchRoundtripDuration prometheus.Summary
-}
+	// Keep the "kubelet" subsystem for backward compatibility.
+	stargz = "stargz"
 
-var instance *FileSystemMetrics
+)
 
-func GetMetrics() *FileSystemMetrics {
-	once.Do(func() {
-		instance = &FileSystemMetrics {
-			MountOperationDuration: prometheus.NewSummary(
-				prometheus.SummaryOpts{
-					Name:       "fs_mount_request_duration",
-					Help:       "fs mount latency in seconds",
-					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-				}),
-			FetchRoundtripDuration: prometheus.NewSummary(
-				prometheus.SummaryOpts{
-					Name:       "fetch_request_roundtrip_duration",
-					Help:       "fetch request roundtrip latency in seconds",
-					Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-				}),
-		}
+var (
+	// DockerOperationsLatency collects operation latency numbers by operation
+	// type.
+	OperationsLatency = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: stargz,
+			Name:      OperationsLatencyKey,
+			Help:      "Latency in seconds of stargz snapshotter operations. Broken down by operation type.",
+			Buckets:   prometheus.DefBuckets,
+		},
+		[]string{"operation_type"},
+	)
+	
+)
 
-		instance.register()
-	})
-
-	return instance
-}
+var registerMetrics sync.Once
 
 // we can potentially utilize options
-func (m *FileSystemMetrics) register() {
-	prometheus.MustRegister(m.MountOperationDuration)
-	prometheus.MustRegister(m.FetchRoundtripDuration)
+func Register() {
+	registerMetrics.Do(func() {
+		prometheus.MustRegister(OperationsLatency)
+	})
 }

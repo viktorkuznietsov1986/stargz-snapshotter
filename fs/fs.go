@@ -113,16 +113,12 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var fsMetrics *fsmetrics.FileSystemMetrics
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", metrics.Labels{"handler": "metrics"})
-		fsMetrics = fsmetrics.GetMetrics()
+		metrics.Register()
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
 	}
-
-	// if (fsMetrics != nil) {
-	// 	fsMetrics.Register()
-	// }
 
 	return &filesystem{
 		resolver:              r,
@@ -136,7 +132,6 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 		allowNoVerification:   cfg.AllowNoVerification,
 		disableVerification:   cfg.DisableVerification,
 		metricsController:     c,
-		fileSystemMetrics:	   fsMetrics,
 	}, nil
 }
 
@@ -153,15 +148,12 @@ type filesystem struct {
 	disableVerification   bool
 	getSources            source.GetSources
 	metricsController     *fsmetrics.Controller
-	fileSystemMetrics	  *fsmetrics.FileSystemMetrics
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
-	if (fs.fileSystemMetrics != nil) {
-		timer := prometheus.NewTimer(fs.fileSystemMetrics.MountOperationDuration)
-		defer timer.ObserveDuration()
-	}
+	timer := prometheus.NewTimer(metrics.MountOperationDuration.WithLabels("fs_mount"))
+	defer timer.ObserveDuration()
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
