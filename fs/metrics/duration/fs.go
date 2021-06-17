@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package metrics
+package durationmetrics
 
 import (
 	"sync"
@@ -24,21 +24,23 @@ import (
 
 const (
 	// DockerOperationsKey is the key for docker operation metrics.
-	OperationsLatencyKey = "operation_duration"
+	OperationLatencyKey = "operation_duration"
 	
 
-	// Keep the "kubelet" subsystem for backward compatibility.
-	stargz = "stargz"
+	// Keep namespace as stargz and subsystem as fs.
+	namespace = "stargz"
+	subsystem = "fs"
 
 )
 
 var (
-	// DockerOperationsLatency collects operation latency numbers by operation
+	// OperationLatency collects operation latency numbers by operation
 	// type.
-	OperationsLatency = prometheus.NewHistogramVec(
+	OperationLatency = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Namespace: stargz,
-			Name:      OperationsLatencyKey,
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      OperationLatencyKey,
 			Help:      "Latency in seconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   prometheus.DefBuckets,
 		},
@@ -49,10 +51,10 @@ var (
 
 var registerMetrics sync.Once
 
-// We can potentially utilize options to granularly allow different metrics
+// Register metrics. This is always called only once.
 func Register() {
 	registerMetrics.Do(func() {
-		prometheus.MustRegister(OperationsLatency)
+		prometheus.MustRegister(OperationLatency)
 	})
 }
 

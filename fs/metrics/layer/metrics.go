@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package metrics
+package layer_metrics
 
 import (
 	"sync"

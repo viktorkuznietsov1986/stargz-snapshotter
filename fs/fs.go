@@ -51,7 +51,8 @@ import (
 	"github.com/containerd/stargz-snapshotter/estargz"
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/layer"
-	fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
+	layermetrics "github.com/containerd/stargz-snapshotter/fs/metrics/layer"
+	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	"github.com/containerd/stargz-snapshotter/snapshot"
 	"github.com/containerd/stargz-snapshotter/task"
@@ -111,11 +112,10 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 
 	var ns *metrics.Namespace
 	if !cfg.NoPrometheus {
-		ns = metrics.NewNamespace("stargz", "fs", metrics.Labels{"handler": "metrics"})
-		
-		fsmetrics.Register() // Register duration metrics. This will happen only once.
+		ns = metrics.NewNamespace("stargz", "fs", nil)
+		durationmetrics.Register() // Register duration metrics. This will happen only once.
 	}
-	c := fsmetrics.NewLayerMetrics(ns)
+	c := layermetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
 	}
@@ -147,14 +147,13 @@ type filesystem struct {
 	allowNoVerification   bool
 	disableVerification   bool
 	getSources            source.GetSources
-	metricsController     *fsmetrics.Controller
+	metricsController     *layermetrics.Controller
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
 	start := time.Now()
-	timer := prometheus.NewTimer()
-	defer fsmetrics.OperationsLatency.WithLabelValues("fs_mount").Observe(fsmetrics.SinceInSeconds(start))
+	defer durationmetrics.OperationLatency.WithLabelValues("fs_mount").Observe(durationmetrics.SinceInSeconds(start))
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
