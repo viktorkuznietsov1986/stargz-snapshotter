@@ -113,7 +113,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var fsMetrics *fsmetrics.FileSystemMetrics
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", metrics.Labels{"handler": "metrics"})
-		metrics.Register()
+		fsmetrics.Register()
 	}
 	c := fsmetrics.NewLayerMetrics(ns)
 	if ns != nil {
@@ -152,7 +152,7 @@ type filesystem struct {
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
-	timer := prometheus.NewTimer(metrics.MountOperationDuration.WithLabels("fs_mount"))
+	timer := prometheus.NewTimer(fsmetrics.MountOperationDuration.WithLabels("fs_mount"))
 	defer timer.ObserveDuration()
 	
 	// This is a prioritized task and all background tasks will be stopped
