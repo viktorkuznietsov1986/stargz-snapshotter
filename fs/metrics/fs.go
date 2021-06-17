@@ -48,14 +48,14 @@ func GetMetrics() *FileSystemMetrics {
 				}),
 		}
 
-		instance.register()
+		//instance.register()
 	})
 
 	return instance
 }
 
 // we can potentially utilize options
-func (m *FileSystemMetrics) register() {
+func (m *FileSystemMetrics) Register() {
 	prometheus.MustRegister(m.MountOperationDuration)
 	prometheus.MustRegister(m.FetchRoundtripDuration)
 }
