@@ -48,7 +48,7 @@ func GetMetrics() *FileSystemMetrics {
 				}),
 		}
 
-		isntance.register()
+		instance.register()
 	})
 
 	return instance
