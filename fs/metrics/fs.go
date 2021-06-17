@@ -49,9 +49,14 @@ var (
 
 var registerMetrics sync.Once
 
-// we can potentially utilize options
+// We can potentially utilize options to granularly allow different metrics
 func Register() {
 	registerMetrics.Do(func() {
 		prometheus.MustRegister(OperationsLatency)
 	})
+}
+
+// SinceInSeconds gets the time since the specified start in seconds.
+func SinceInSeconds(start time.Time) float64 {
+	return time.Since(start).Seconds()
 }

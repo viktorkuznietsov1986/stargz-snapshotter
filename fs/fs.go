@@ -152,8 +152,9 @@ type filesystem struct {
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the request duration
-	timer := prometheus.NewTimer(fsmetrics.OperationsLatency.WithLabelValues("fs_mount"))
-	defer timer.ObserveDuration()
+	start := time.Now()
+	timer := prometheus.NewTimer()
+	defer fsmetrics.OperationsLatency.WithLabelValues("fs_mount").Observe(fsmetrics.SinceInSeconds(start))
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
