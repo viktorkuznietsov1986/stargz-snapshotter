@@ -34,6 +34,7 @@ import (
 	"sync"
 	"syscall"
 	"unsafe"
+	"time"
 
 	"github.com/containerd/stargz-snapshotter/estargz"
 	"github.com/containerd/stargz-snapshotter/fs/reader"
