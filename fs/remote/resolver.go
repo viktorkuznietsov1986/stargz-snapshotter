@@ -45,6 +45,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
 	"github.com/pkg/errors"
 )
 
@@ -290,6 +291,7 @@ func getSize(ctx context.Context, url string, tr http.RoundTripper, timeout time
 		headStatusCode, res.StatusCode)
 }
 
+// one per layer
 type fetcher struct {
 	url           string
 	urlMu         sync.Mutex
@@ -351,6 +353,11 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 	req.Header.Add("Range", fmt.Sprintf("bytes=%s", ranges[:len(ranges)-1]))
 	req.Header.Add("Accept-Encoding", "identity")
 	req.Close = false
+
+	// Recording the roundtrip latency fetch operation
+	start := time.Now()
+	defer durationmetrics.OperationLatency.WithLabelValues("fetch_roundtrip").Observe(durationmetrics.SinceInSeconds(start))
+
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {
 		return nil, err

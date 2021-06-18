@@ -51,7 +51,8 @@ import (
 	"github.com/containerd/stargz-snapshotter/estargz"
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/layer"
-	fsmetrics "github.com/containerd/stargz-snapshotter/fs/metrics"
+	layermetrics "github.com/containerd/stargz-snapshotter/fs/metrics/layer"
+	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	"github.com/containerd/stargz-snapshotter/snapshot"
 	"github.com/containerd/stargz-snapshotter/task"
@@ -73,6 +74,13 @@ type Option func(*options)
 type options struct {
 	getSources source.GetSources
 }
+
+/*var fsMountOperationLatency = prometheus.NewSummary(
+        prometheus.SummaryOpts{
+	        Name:       "fs_mount_request_duration",
+	        Help:       "fs mount latency in milliseconds",
+	        Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+	    })*/
 
 func WithGetSources(s source.GetSources) Option {
 	return func(opts *options) {
@@ -104,8 +112,9 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var ns *metrics.Namespace
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
+		durationmetrics.Register() // Register duration metrics. This will happen only once.
 	}
-	c := fsmetrics.NewLayerMetrics(ns)
+	c := layermetrics.NewLayerMetrics(ns)
 	if ns != nil {
 		metrics.Register(ns)
 	}
@@ -137,10 +146,14 @@ type filesystem struct {
 	allowNoVerification   bool
 	disableVerification   bool
 	getSources            source.GetSources
-	metricsController     *fsmetrics.Controller
+	metricsController     *layermetrics.Controller
 }
 
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
+	// Measure the request duration
+	start := time.Now()
+	defer durationmetrics.OperationLatency.WithLabelValues("fs_mount").Observe(durationmetrics.SinceInSeconds(start))
+	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
 	// tasks.
@@ -306,6 +319,7 @@ func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[s
 	}
 
 	go server.Serve()
+
 	return server.WaitMount()
 }
 
