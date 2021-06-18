@@ -38,6 +38,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/estargz"
 	"github.com/containerd/stargz-snapshotter/fs/reader"
 	"github.com/containerd/stargz-snapshotter/fs/remote"
+	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
 	fusefs "github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
 	digest "github.com/opencontainers/go-digest"
@@ -82,6 +83,10 @@ var _ = (fusefs.InodeEmbedder)((*node)(nil))
 var _ = (fusefs.NodeReaddirer)((*node)(nil))
 
 func (n *node) Readdir(ctx context.Context) (fusefs.DirStream, syscall.Errno) {
+	// Measure how long node_readdir operation takes	
+	start := time.Now()
+	defer durationmetrics.OperationLatency.WithLabelValues("node_readdir").Observe(durationmetrics.SinceInSeconds(start))
+
 	var ents []fuse.DirEntry
 	whiteouts := map[string]*estargz.TOCEntry{}
 	normalEnts := map[string]bool{}
