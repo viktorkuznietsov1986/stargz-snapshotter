@@ -75,13 +75,6 @@ type options struct {
 	getSources source.GetSources
 }
 
-/*var fsMountOperationLatency = prometheus.NewSummary(
-        prometheus.SummaryOpts{
-	        Name:       "fs_mount_request_duration",
-	        Help:       "fs mount latency in milliseconds",
-	        Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-	    })*/
-
 func WithGetSources(s source.GetSources) Option {
 	return func(opts *options) {
 		opts.getSources = s
