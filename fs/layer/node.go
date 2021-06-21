@@ -84,9 +84,9 @@ var _ = (fusefs.InodeEmbedder)((*node)(nil))
 var _ = (fusefs.NodeReaddirer)((*node)(nil))
 
 func (n *node) Readdir(ctx context.Context) (fusefs.DirStream, syscall.Errno) {
-	// Measure how long node_readdir operation takes	
+	// Measure how long node_readdir operation takes.	
 	start := time.Now()
-	defer durationmetrics.OperationLatency.WithLabelValues("node_readdir").Observe(durationmetrics.SinceInSeconds(start))
+	defer durationmetrics.OperationLatency.WithLabelValues("node_readdir").Observe(durationmetrics.SinceInMilliseconds(start))
 
 	var ents []fuse.DirEntry
 	whiteouts := map[string]*estargz.TOCEntry{}
@@ -265,7 +265,6 @@ type file struct {
 
 var _ = (fusefs.FileReader)((*file)(nil))
 
-// measure the time it takes for that reader to complete (every file will have a separate file object)
 func (f *file) Read(ctx context.Context, dest []byte, off int64) (fuse.ReadResult, syscall.Errno) {
 	n, err := f.ra.ReadAt(dest, off)
 	if err != nil && err != io.EOF {

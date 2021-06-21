@@ -31,6 +31,8 @@ const (
 	namespace = "stargz"
 	subsystem = "fs"
 
+	// Buckets for OperationLatency metric in milliseconds.
+	latencyBuckets = []float64{5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000} // in milliseconds
 )
 
 var (
@@ -41,8 +43,8 @@ var (
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      OperationLatencyKey,
-			Help:      "Latency in seconds of stargz snapshotter operations. Broken down by operation type.",
-			Buckets:   prometheus.DefBuckets,
+			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
+			Buckets:   latencyBuckets,
 		},
 		[]string{"operation_type"},
 	)
@@ -58,7 +60,7 @@ func Register() {
 	})
 }
 
-// SinceInSeconds gets the time since the specified start in seconds.
-func SinceInSeconds(start time.Time) float64 {
-	return time.Since(start).Seconds()
+// SinceInMilliseconds gets the time since the specified start in microseconds.
+func SinceInMilliseconds(start time.Time) float64 {
+	return time.Since(start).Milliseconds()
 }

@@ -72,6 +72,8 @@ type snapshotterConfig struct {
 
 	// MetricsAddress is address for the metrics API
 	MetricsAddress string `toml:"metrics_address"`
+	
+	// NoPrometheus is a flag to disable the emission of the metrics
 	NoPrometheus   bool   `toml:"no_prometheus"`
 }
 
