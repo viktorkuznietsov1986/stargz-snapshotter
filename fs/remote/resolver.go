@@ -353,9 +353,9 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 	req.Header.Add("Accept-Encoding", "identity")
 	req.Close = false
 
-	// Recording the roundtrip latency of fetch operation.
+	// Recording the roundtrip latency for remote registry GET operation.
 	start := time.Now()
-	defer durationmetrics.OperationLatency.WithLabelValues("fetch_roundtrip").Observe(durationmetrics.SinceInMilliseconds(start))
+	defer durationmetrics.OperationLatency.WithLabelValues(durationmetrics.RemoteRegistryGet).Observe(durationmetrics.SinceInMilliseconds(start))
 
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {

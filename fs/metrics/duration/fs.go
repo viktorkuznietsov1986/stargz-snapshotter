@@ -23,18 +23,24 @@ import (
 )
 
 const (
-	// DockerOperationsKey is the key for docker operation metrics.
+	// OperationLatencyKey is the key for stargz operation metrics.
 	OperationLatencyKey = "operation_duration"
-	
 
 	// Keep namespace as stargz and subsystem as fs.
 	namespace = "stargz"
 	subsystem = "fs"
 )
 
+// Lists all metric labels.
+const (
+	Mount = "mount"
+	RemoteRegistryGet = "remote_registry_get"
+	NodeReaddir = "node_readdir"
+)
+
 var (
 	// Buckets for OperationLatency metric in milliseconds.
-	latencyBuckets = []float64{5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000} // in milliseconds
+	latencyBuckets = []float64{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384} // in milliseconds
 
 	// OperationLatency collects operation latency numbers by operation
 	// type.
