@@ -60,7 +60,7 @@ var (
 	
 )
 
-var registerMetrics sync.Once
+var once sync.Once
 
 var hostname string
 
@@ -70,7 +70,7 @@ func sinceInMilliseconds(start time.Time) float64 {
 }
 
 func getHostName() string {
-	sync.Once.Do(func() {
+	once.Do(func() {
 		hostname, err := os.Hostname()
 		if err != nil {
 			hostname = ""
@@ -82,7 +82,7 @@ func getHostName() string {
 
 // Register metrics. This is always called only once.
 func Register() {
-	registerMetrics.Do(func() {
+	once.Do(func() {
 		prometheus.MustRegister(OperationLatency)
 	})
 }
