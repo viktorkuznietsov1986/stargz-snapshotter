@@ -145,7 +145,7 @@ type filesystem struct {
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the Mount operation duration.
 	start := time.Now()
-	defer durationmetrics.OperationLatency.WithLabelValues(durationmetrics.Mount).Observe(durationmetrics.SinceInMilliseconds(start))
+	defer durationmetrics.MeasureLatency(durationmetrics.Mount, start)
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background

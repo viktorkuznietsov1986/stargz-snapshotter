@@ -73,7 +73,7 @@ func getHostName() string {
 	sync.Once.Do(func() {
 		hostname, err := os.Hostname()
 		if err != nil {
-			hostmane = ""
+			hostname = ""
 		}
 	})
 	
@@ -88,5 +88,5 @@ func Register() {
 }
 
 func MeasureLatency(operation string, start time.Time) {
-	durationmetrics.OperationLatency.WithLabelValues(operation, getHostName()).Observe(sinceInMilliseconds(start))
+	OperationLatency.WithLabelValues(operation, getHostName()).Observe(sinceInMilliseconds(start))
 }
