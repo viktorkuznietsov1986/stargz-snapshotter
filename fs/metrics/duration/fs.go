@@ -68,5 +68,5 @@ func Register() {
 
 // SinceInMilliseconds gets the time since the specified start in microseconds.
 func SinceInMilliseconds(start time.Time) float64 {
-	return float64(time.Since(start).Milliseconds())
+	return float64(time.Since(start).Nanoseconds()/1e6)
 }
