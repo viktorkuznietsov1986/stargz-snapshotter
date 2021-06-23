@@ -71,10 +71,13 @@ func sinceInMilliseconds(start time.Time) float64 {
 
 func getHostName() string {
 	once.Do(func() {
-		hostname, err := os.Hostname()
+		h, err := os.Hostname()
 		if err != nil {
 			hostname = ""
+			return
 		}
+
+		hostname = h
 	})
 	
 	return hostname
