@@ -88,5 +88,5 @@ func Register() {
 }
 
 func MeasureLatency(operation string, start time.Time) {
-	durationmetrics.OperationLatency.WithLabelValues(operation, getHostName()).Observe(SinceInMilliseconds(start))
+	durationmetrics.OperationLatency.WithLabelValues(operation, getHostName()).Observe(sinceInMilliseconds(start))
 }
