@@ -53,9 +53,9 @@ var (
 			Name:      OperationLatencyKey,
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
-			ConstLabels: prometheus.Labels{"component": "file_system"}
+			ConstLabels: prometheus.Labels {"component": "file_system"},
 		},
-		[]string{"operation_type", "machine"},
+		[]string{"operation_type", "host"},
 	)
 	
 )
@@ -64,19 +64,12 @@ var registerMetrics sync.Once
 
 var hostname string
 
-// Register metrics. This is always called only once.
-func Register() {
-	registerMetrics.Do(func() {
-		prometheus.MustRegister(OperationLatency)
-	})
-}
-
-// SinceInMilliseconds gets the time since the specified start in microseconds.
-func SinceInMilliseconds(start time.Time) float64 {
+// sinceInMilliseconds gets the time since the specified start in microseconds.
+func sinceInMilliseconds(start time.Time) float64 {
 	return float64(time.Since(start).Nanoseconds()/1e6)
 }
 
-func GetHostName() string {
+func getHostName() string {
 	sync.Once.Do(func() {
 		hostname, err := os.Hostname()
 		if err != nil {
@@ -85,4 +78,15 @@ func GetHostName() string {
 	})
 	
 	return hostname
+}
+
+// Register metrics. This is always called only once.
+func Register() {
+	registerMetrics.Do(func() {
+		prometheus.MustRegister(OperationLatency)
+	})
+}
+
+func MeasureLatency(operation string, start time.Time) {
+	durationmetrics.OperationLatency.WithLabelValues(operation, getHostName()).Observe(SinceInMilliseconds(start))
 }
