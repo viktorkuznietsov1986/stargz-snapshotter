@@ -54,7 +54,7 @@ var (
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
 			ConstLabels: prometheus.Labels {"component": "file_system"},
-			Unit:	   "ms"	
+			Unit:	   "ms",
 		},
 		[]string{"operation_type", "host"},
 	)
