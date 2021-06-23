@@ -17,7 +17,6 @@
 package durationmetrics
 
 import (
-	"os"
 	"sync"
 	"time"
 
@@ -53,44 +52,31 @@ var (
 			Name:      OperationLatencyKey,
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
-			ConstLabels: prometheus.Labels {"component": "file_system"},
-			Unit:	   "ms",
 		},
 		[]string{"operation_type", "host"},
 	)
 	
 )
 
-var once sync.Once
+var register sync.Once
 
 var hostname string
 
-// sinceInMilliseconds gets the time since the specified start in microseconds.
+// sinceInMilliseconds gets the time since the specified start in milliseconds.
+// The division by 1e6 is made to have the milliseconds value as floating point number, since the native method
+// .Milliseconds() returns an integer value and you can lost a precision for sub-millisecond values. 
 func sinceInMilliseconds(start time.Time) float64 {
 	return float64(time.Since(start).Nanoseconds()/1e6)
 }
 
-func getHostName() string {
-	once.Do(func() {
-		h, err := os.Hostname()
-		if err != nil {
-			hostname = ""
-			return
-		}
-
-		hostname = h
-	})
-	
-	return hostname
-}
-
 // Register metrics. This is always called only once.
 func Register() {
-	once.Do(func() {
+	register.Do(func() {
 		prometheus.MustRegister(OperationLatency)
 	})
 }
 
+// Wraps the labels attachment as well as calling Observe into a single method.
 func MeasureLatency(operation string, start time.Time) {
-	OperationLatency.WithLabelValues(operation, getHostName()).Observe(sinceInMilliseconds(start))
+	OperationLatency.WithLabelValues(operation).Observe(sinceInMilliseconds(start))
 }
