@@ -86,7 +86,7 @@ var _ = (fusefs.NodeReaddirer)((*node)(nil))
 func (n *node) Readdir(ctx context.Context) (fusefs.DirStream, syscall.Errno) {
 	// Measure how long node_readdir operation takes.	
 	start := time.Now()
-	defer durationmetrics.OperationLatency.WithLabelValues("node_readdir").Observe(durationmetrics.SinceInMilliseconds(start))
+	defer durationmetrics.MeasureLatency(durationmetrics.NodeReaddir, start)
 
 	var ents []fuse.DirEntry
 	whiteouts := map[string]*estargz.TOCEntry{}

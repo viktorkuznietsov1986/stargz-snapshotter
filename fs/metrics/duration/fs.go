@@ -17,8 +17,10 @@
 package durationmetrics
 
 import (
+	"os"
 	"sync"
 	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -51,13 +53,16 @@ var (
 			Name:      OperationLatencyKey,
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
+			ConstLabels: prometheus.Labels{"component": "file_system"}
 		},
-		[]string{"operation_type"},
+		[]string{"operation_type", "machine"},
 	)
 	
 )
 
 var registerMetrics sync.Once
+
+var hostname string
 
 // Register metrics. This is always called only once.
 func Register() {
@@ -69,4 +74,15 @@ func Register() {
 // SinceInMilliseconds gets the time since the specified start in microseconds.
 func SinceInMilliseconds(start time.Time) float64 {
 	return float64(time.Since(start).Nanoseconds()/1e6)
+}
+
+func GetHostName() string {
+	sync.Once.Do(func() {
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostmane = ""
+		}
+	})
+	
+	return hostname
 }

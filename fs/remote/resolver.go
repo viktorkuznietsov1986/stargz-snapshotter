@@ -355,7 +355,7 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 
 	// Recording the roundtrip latency for remote registry GET operation.
 	start := time.Now()
-	defer durationmetrics.OperationLatency.WithLabelValues(durationmetrics.RemoteRegistryGet).Observe(durationmetrics.SinceInMilliseconds(start))
+	defer durationmetrics.MeasureLatency(durationmetrics.RemoteRegistryGet, start)
 
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {
