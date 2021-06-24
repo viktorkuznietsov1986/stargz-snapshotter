@@ -53,7 +53,7 @@ var (
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
 		},
-		[]string{"operation_type", "host"},
+		[]string{"operation_type"},
 	)
 	
 )
