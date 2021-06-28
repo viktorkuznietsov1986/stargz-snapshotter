@@ -45,7 +45,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
+	commonmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/common"
 	"github.com/pkg/errors"
 )
 
@@ -355,7 +355,7 @@ func (f *fetcher) fetch(ctx context.Context, rs []region, retry bool, opts *opti
 
 	// Recording the roundtrip latency for remote registry GET operation.
 	start := time.Now()
-	defer durationmetrics.MeasureLatency(durationmetrics.RemoteRegistryGet, start)
+	defer commonmetrics.MeasureLatency(commonmetrics.RemoteRegistryGet, start)
 
 	res, err := tr.RoundTrip(req) // NOT DefaultClient; don't want redirects
 	if err != nil {

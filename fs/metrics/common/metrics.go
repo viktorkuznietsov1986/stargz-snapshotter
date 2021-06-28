@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package durationmetrics
+package commonmetrics
 
 import (
 	"sync"
@@ -45,13 +45,33 @@ var (
 
 	// OperationLatency collects operation latency numbers by operation
 	// type.
-	OperationLatency = prometheus.NewHistogramVec(
+	operationLatency = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      OperationLatencyKey,
 			Help:      "Latency in milliseconds of stargz snapshotter operations. Broken down by operation type.",
 			Buckets:   latencyBuckets,
+		},
+		[]string{"operation_type"},
+	)
+
+	operationsCount = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name: "duration_measurements_count",
+			Help: "The total number of duration measurements",
+		},
+		[]string{"operation_type"},
+	)
+
+	operationLatencySum = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name: "duration_measurements_sum",
+			Help: "The sum of duration measurements in milliseconds",
 		},
 		[]string{"operation_type"},
 	)
@@ -72,11 +92,16 @@ func sinceInMilliseconds(start time.Time) float64 {
 // Register metrics. This is always called only once.
 func Register() {
 	register.Do(func() {
-		prometheus.MustRegister(OperationLatency)
+		//prometheus.MustRegister(operationLatency)
+		prometheus.MustRegister(operationsCount)
+		prometheus.MustRegister(operationLatencySum)
 	})
 }
 
 // Wraps the labels attachment as well as calling Observe into a single method.
 func MeasureLatency(operation string, start time.Time) {
-	OperationLatency.WithLabelValues(operation).Observe(sinceInMilliseconds(start))
+	var duration = sinceInMilliseconds(start)
+	//operationLatency.WithLabelValues(operation).Observe(duration)
+	operationsCount.WithLabels(operation).Inc()
+	operationLatencySum.WithLabels(operation).Add(duration)
 }

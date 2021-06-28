@@ -52,7 +52,7 @@ import (
 	"github.com/containerd/stargz-snapshotter/fs/config"
 	"github.com/containerd/stargz-snapshotter/fs/layer"
 	layermetrics "github.com/containerd/stargz-snapshotter/fs/metrics/layer"
-	durationmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/duration"
+	commonmetrics "github.com/containerd/stargz-snapshotter/fs/metrics/common"
 	"github.com/containerd/stargz-snapshotter/fs/source"
 	"github.com/containerd/stargz-snapshotter/snapshot"
 	"github.com/containerd/stargz-snapshotter/task"
@@ -105,7 +105,7 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var ns *metrics.Namespace
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
-		durationmetrics.Register() // Register duration metrics. This will happen only once.
+		commonmetrics.Register() // Register duration metrics. This will happen only once.
 	}
 	c := layermetrics.NewLayerMetrics(ns)
 	if ns != nil {
@@ -145,7 +145,7 @@ type filesystem struct {
 func (fs *filesystem) Mount(ctx context.Context, mountpoint string, labels map[string]string) (retErr error) {
 	// Measure the Mount operation duration.
 	start := time.Now()
-	defer durationmetrics.MeasureLatency(durationmetrics.Mount, start)
+	defer commonmetrics.MeasureLatency(commonmetrics.Mount, start)
 	
 	// This is a prioritized task and all background tasks will be stopped
 	// execution so this can avoid being disturbed for NW traffic by background
