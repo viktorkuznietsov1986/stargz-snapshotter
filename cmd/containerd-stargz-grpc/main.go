@@ -193,7 +193,7 @@ func serve(ctx context.Context, rpc *grpc.Server, addr string, rs snapshots.Snap
 	errCh := make(chan error, 1)
 
 	// We need to consider both the existence of MetricsAddress as well as NoPrometheus flag not set
-	if config.MetricsAddress != "" && config.NoPrometheus != true {
+	if config.MetricsAddress != "" && !config.NoPrometheus {
 		l, err := net.Listen("tcp", config.MetricsAddress)
 		if err != nil {
 			return false, errors.Wrapf(err, "failed to get listener for metrics endpoint")

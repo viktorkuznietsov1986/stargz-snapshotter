@@ -32,9 +32,7 @@ func NewLayerMetrics(ns *metrics.Namespace) *Controller {
 		ns:    ns,
 		layer: make(map[string]layer.Layer),
 	}
-
 	c.metrics = append(c.metrics, layerMetrics...)
-
 	ns.Add(c)
 	return c
 }
