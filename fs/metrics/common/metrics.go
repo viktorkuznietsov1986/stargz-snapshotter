@@ -104,5 +104,5 @@ func MeasureLatency(operation string, start time.Time) {
 	//operationLatency.WithLabelValues(operation).Observe(duration)
 	var labels = prometheus.Labels{"operation_type": operation}
 	operationsCount.With(labels).Inc()
-	operationLatencySum.WithLabels(labels).Add(duration)
+	operationLatencySum.With(labels).Add(duration)
 }
