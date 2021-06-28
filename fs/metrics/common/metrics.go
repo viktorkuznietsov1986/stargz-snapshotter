@@ -102,6 +102,7 @@ func Register() {
 func MeasureLatency(operation string, start time.Time) {
 	var duration = sinceInMilliseconds(start)
 	//operationLatency.WithLabelValues(operation).Observe(duration)
-	operationsCount.WithLabels(operation).Inc()
-	operationLatencySum.WithLabels(operation).Add(duration)
+	var labels = prometheus.Labels{"operation_type": operation}
+	operationsCount.With(labels).Inc()
+	operationLatencySum.WithLabels(labels).Add(duration)
 }
