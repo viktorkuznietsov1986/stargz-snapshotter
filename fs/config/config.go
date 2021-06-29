@@ -46,6 +46,11 @@ type Config struct {
 	DisableVerification bool   `toml:"disable_verification"`
 	MaxConcurrency      int64  `toml:"max_concurrency"`
 	NoPrometheus        bool   `toml:"no_prometheus"`
+	
+	// Set to true if need to use Prometheus Histogram metric for measuring latency.
+	// Otherwise the latencies will be measured by Sum and Count, which is less accurate, but
+	// also less resource intensive on metrics server side.
+	UseHistogram        bool   `toml:"use_histogram"`
 
 	// BlobConfig is config for layer blob management.
 	BlobConfig `toml:"blob"`

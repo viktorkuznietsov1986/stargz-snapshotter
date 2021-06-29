@@ -26,6 +26,8 @@ import (
 const (
 	// OperationLatencyKey is the key for stargz operation metrics.
 	OperationLatencyKey = "operation_duration"
+	DurationMeasurementCountKey = "duration_measurements_count"
+	DurationMeasurementSumKey = "duration_measurements_sum"
 
 	// Keep namespace as stargz and subsystem as fs.
 	namespace = "stargz"
@@ -60,7 +62,7 @@ var (
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
-			Name: "duration_measurements_count",
+			Name: DurationMeasurementCountKey,
 			Help: "The total number of duration measurements",
 		},
 		[]string{"operation_type"},
@@ -70,7 +72,7 @@ var (
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
-			Name: "duration_measurements_sum",
+			Name: DurationMeasurementSumKey,
 			Help: "The sum of duration measurements in milliseconds",
 		},
 		[]string{"operation_type"},
@@ -90,19 +92,27 @@ func sinceInMilliseconds(start time.Time) float64 {
 }
 
 // Register metrics. This is always called only once.
-func Register() {
+func Register(useHistogram bool) {
 	register.Do(func() {
-		//prometheus.MustRegister(operationLatency)
-		prometheus.MustRegister(operationsCount)
-		prometheus.MustRegister(operationLatencySum)
+		// Register latency metrics. We'll use either Histogram or operation Count and Sum.
+		// While Cound and Sum do not provide the same granularity as Histogram 
+		// and they'll always represent Average latency, they are much simpler and do not consume resources on 
+		// metrics server side in order to calculate quantiles as requried for Histogram.
+		if useHistogram {
+			prometheus.MustRegister(operationLatency)
+		}
+		else {
+			prometheus.MustRegister(operationsCount)
+			prometheus.MustRegister(operationLatencySum)
+		}
 	})
 }
 
 // Wraps the labels attachment as well as calling Observe into a single method.
 func MeasureLatency(operation string, start time.Time) {
-	var duration = sinceInMilliseconds(start)
-	//operationLatency.WithLabelValues(operation).Observe(duration)
-	var labels = prometheus.Labels{"operation_type": operation}
+	duration := sinceInMilliseconds(start)
+	operationLatency.WithLabelValues(operation).Observe(duration)
+	labels := prometheus.Labels{"operation_type": operation}
 	operationsCount.With(labels).Inc()
 	operationLatencySum.With(labels).Add(duration)
 }
