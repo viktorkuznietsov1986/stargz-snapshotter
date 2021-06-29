@@ -100,8 +100,7 @@ func Register(useHistogram bool) {
 		// metrics server side in order to calculate quantiles as requried for Histogram.
 		if useHistogram {
 			prometheus.MustRegister(operationLatency)
-		}
-		else {
+		} else {
 			prometheus.MustRegister(operationsCount)
 			prometheus.MustRegister(operationLatencySum)
 		}
