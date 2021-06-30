@@ -63,7 +63,7 @@ var (
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name: DurationMeasurementCountKey,
-			Help: "The total number of duration measurements",
+			Help: "The total number of duration measurements.",
 		},
 		[]string{"operation_type"},
 	)
@@ -73,7 +73,7 @@ var (
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name: DurationMeasurementSumKey,
-			Help: "The sum of duration measurements in milliseconds",
+			Help: "The sum of duration measurements in milliseconds.",
 		},
 		[]string{"operation_type"},
 	)
@@ -88,7 +88,7 @@ var hostname string
 // The division by 1e6 is made to have the milliseconds value as floating point number, since the native method
 // .Milliseconds() returns an integer value and you can lost a precision for sub-millisecond values. 
 func sinceInMilliseconds(start time.Time) float64 {
-	return float64(time.Since(start).Nanoseconds()/1e6)
+	return float64(time.Since(start).Nanoseconds())/1e6
 }
 
 // Register metrics. This is always called only once.
