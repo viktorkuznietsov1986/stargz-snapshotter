@@ -95,7 +95,7 @@ func sinceInMilliseconds(start time.Time) float64 {
 func Register(useHistogram bool) {
 	register.Do(func() {
 		// Register latency metrics. We'll use either Histogram or operation Count and Sum.
-		// While Cound and Sum do not provide the same granularity as Histogram 
+		// While Count and Sum do not provide the same granularity as Histogram 
 		// and they'll always represent Average latency, they are much simpler and do not consume resources on 
 		// metrics server side in order to calculate quantiles as requried for Histogram.
 		if useHistogram {
