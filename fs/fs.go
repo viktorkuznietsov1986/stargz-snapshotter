@@ -105,11 +105,11 @@ func NewFilesystem(root string, cfg config.Config, opts ...Option) (_ snapshot.F
 	var ns *metrics.Namespace
 	if !cfg.NoPrometheus {
 		ns = metrics.NewNamespace("stargz", "fs", nil)
-		commonmetrics.Register(cfg.UseHistogram) // Register duration metrics. This will happen only once.
+		commonmetrics.Register() // Register common metrics. This will happen only once.
 	}
 	c := layermetrics.NewLayerMetrics(ns)
 	if ns != nil {
-		metrics.Register(ns)
+		metrics.Register(ns) // Register layer metrics
 	}
 
 	return &filesystem{

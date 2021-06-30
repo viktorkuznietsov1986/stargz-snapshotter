@@ -92,26 +92,13 @@ func sinceInMilliseconds(start time.Time) float64 {
 }
 
 // Register metrics. This is always called only once.
-func Register(useHistogram bool) {
+func Register() {
 	register.Do(func() {
-		// Register latency metrics. We'll use either Histogram or operation Count and Sum.
-		// While Count and Sum do not provide the same granularity as Histogram 
-		// and they'll always represent Average latency, they are much simpler and do not consume resources on 
-		// metrics server side in order to calculate quantiles as requried for Histogram.
-		if useHistogram {
-			prometheus.MustRegister(operationLatency)
-		} else {
-			prometheus.MustRegister(operationsCount)
-			prometheus.MustRegister(operationLatencySum)
-		}
+		prometheus.MustRegister(operationLatency)
 	})
 }
 
 // Wraps the labels attachment as well as calling Observe into a single method.
 func MeasureLatency(operation string, start time.Time) {
-	duration := sinceInMilliseconds(start)
-	operationLatency.WithLabelValues(operation).Observe(duration)
-	labels := prometheus.Labels{"operation_type": operation}
-	operationsCount.With(labels).Inc()
-	operationLatencySum.With(labels).Add(duration)
+	operationLatency.WithLabelValues(operation).Observe(sinceInMilliseconds(start))
 }
