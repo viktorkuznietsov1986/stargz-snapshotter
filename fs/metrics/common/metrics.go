@@ -26,8 +26,6 @@ import (
 const (
 	// OperationLatencyKey is the key for stargz operation metrics.
 	OperationLatencyKey = "operation_duration"
-	DurationMeasurementCountKey = "duration_measurements_count"
-	DurationMeasurementSumKey = "duration_measurements_sum"
 
 	// Keep namespace as stargz and subsystem as fs.
 	namespace = "stargz"
@@ -57,32 +55,9 @@ var (
 		},
 		[]string{"operation_type"},
 	)
-
-	operationsCount = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: namespace,
-			Subsystem: subsystem,
-			Name: DurationMeasurementCountKey,
-			Help: "The total number of duration measurements.",
-		},
-		[]string{"operation_type"},
-	)
-
-	operationLatencySum = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: namespace,
-			Subsystem: subsystem,
-			Name: DurationMeasurementSumKey,
-			Help: "The sum of duration measurements in milliseconds.",
-		},
-		[]string{"operation_type"},
-	)
-	
 )
 
 var register sync.Once
-
-var hostname string
 
 // sinceInMilliseconds gets the time since the specified start in milliseconds.
 // The division by 1e6 is made to have the milliseconds value as floating point number, since the native method
